@@ -9,7 +9,7 @@
     tools:context=".UpdatesActivity"
     android:weightSum="3">
 
-    <androidx.appcompat.widget.Toolbar
+    <Toolbar
         android:id="@+id/acttoolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -23,24 +23,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_tag"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="5dp"
                 android:layout_gravity="center"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="5dp"
-                android:textColor="#000000"
-                android:text="Updater"
-                android:fontFamily="sans-serif-condensed-medium"
-                android:textSize="34sp"/>
 
 
         </LinearLayout>
 
-    </androidx.appcompat.widget.Toolbar>
+    </Toolbar>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,18 +38,18 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:layout_weight="1.35"
-        android:weightSum="10"
         android:orientation="horizontal"
-        >
+        android:weightSum="4">
 
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
-            android:layout_weight="0.5"
+            android:layout_weight="2.5"
             android:scaleType="fitXY"
             app:srcCompat="@drawable/ic_updates" />
 
@@ -69,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
-            android:layout_weight="9.5"
+            android:layout_weight="1.5"
             android:gravity="center"
             android:orientation="vertical"
             android:paddingTop="10dp"
@@ -83,7 +71,7 @@
                 android:layout_marginTop="50dp"
                 android:layout_marginBottom="20dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="#EA7D7D"
+                app:cardBackgroundColor="#C2C2C2"
                 app:cardCornerRadius="30dp">
 
 
@@ -93,8 +81,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
                     android:onClick="btnoption"
                     android:text="Options" />
             </androidx.cardview.widget.CardView>
@@ -106,15 +92,13 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="50dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="#EA7D7D"
+                app:cardBackgroundColor="#C2C2C2"
                 app:cardCornerRadius="30dp">
 
                 <Button
                     android:id="@+id/btnchangelog"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="match_parent"
-                    android:textColor="#FFFFFF"
-                    android:textAllCaps="false"
                     android:layout_height="match_parent"
                     android:onClick="btnchangelog"
                     android:layout_gravity="center"
@@ -129,94 +113,54 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
-        app:cardBackgroundColor="#6F88FC"
         android:layout_marginEnd="20dp"
         android:layout_weight="1.35"
+        app:cardBackgroundColor="#C2C2C2"
         app:cardCornerRadius="35dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/parentupdates"
-            android:orientation="vertical">
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="20dp">
-
-                <ImageView
-                    android:id="@+id/imageView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/ic_baseline_system_update_24" />
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textColor="#FFFFFF"
-                    android:textAllCaps="false"
-                    android:layout_marginStart="5dp"
-                    android:fontFamily="sans-serif-condensed-medium"
-                    android:text="New update available"
-                    android:textSize="18sp" />
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:scrollbars="vertical"
-                android:id="@+id/realrcv"
-                android:visibility="visible"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
-        </LinearLayout>
-
-        
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:scrollbars="vertical"
+            android:id="@+id/realrcv"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
         <androidx.core.widget.NestedScrollView
             android:id="@+id/no_new_updates_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_height="match_parent"
             android:padding="46dp"
             android:visibility="gone"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:textAllCaps="false"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/list_no_updates"
-                android:textColor="#FFFFFF" />
+                android:textColor="@color/list_no_updates_text_color" />
         </androidx.core.widget.NestedScrollView>
     </androidx.cardview.widget.CardView>
 
-     <Button
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.3"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+
+        <ImageButton
             android:id="@+id/btnrefresh"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
-         android:layout_margin="20dp"
-         android:padding="10dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="0.3"
             android:onClick="btnrefresh"
-            android:textSize="14sp"
-            android:textColor="#000000"
-            android:textStyle="normal"
-         android:textAllCaps="false"
+            android:layout_marginBottom="25dp"
             android:background="@drawable/btn_shape"
-            android:text="Check for updates"
-             />
-
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_menu_refresh" />
+    </LinearLayout>
 
 </LinearLayout>

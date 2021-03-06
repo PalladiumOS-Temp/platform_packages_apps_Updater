@@ -23,25 +23,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.icu.text.DateFormat;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -51,17 +43,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONException;
 import org.lineageos.updater.controller.UpdaterController;
 import org.lineageos.updater.controller.UpdaterService;
 import org.lineageos.updater.download.DownloadClient;
-import org.lineageos.updater.misc.BuildInfoUtils;
 import org.lineageos.updater.misc.Constants;
-import org.lineageos.updater.misc.StringGenerator;
 import org.lineageos.updater.misc.Utils;
 import org.lineageos.updater.model.UpdateInfo;
 
@@ -76,18 +64,14 @@ public class UpdatesActivity extends UpdatesListActivity {
     private static final String TAG = "UpdatesActivity";
     private UpdaterService mUpdaterService;
     private BroadcastReceiver mBroadcastReceiver;
-
     private UpdatesListAdapter mAdapter;
-
-    private View mRefreshIconView;
-    private RotateAnimation mRefreshAnimation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_updates);
 
-        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.realrcv);
         mAdapter = new UpdatesListAdapter(this);
         recyclerView.setAdapter(mAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
@@ -115,58 +99,22 @@ public class UpdatesActivity extends UpdatesListActivity {
             }
         };
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.acttoolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
-        final TextView headerTitle = (TextView) findViewById(R.id.header_title);
-        headerTitle.setText(getString(R.string.header_title_text,
-                BuildInfoUtils.getBuildVersion()));
+    public void btnoption(View v){
+        showPreferencesDialog();
+    }
 
-        updateLastCheckedString();
+    public void btnchangelog(View v){
+        Intent openUrl = new Intent(Intent.ACTION_VIEW,
+                Uri.parse(Utils.getChangelogURL(this)));
+        startActivity(openUrl);
+    }
 
-        final TextView headerBuildVersion = (TextView) findViewById(R.id.header_build_version);
-        headerBuildVersion.setText(
-                getString(R.string.header_android_version, Build.VERSION.RELEASE));
-
-        final TextView headerDeviceName = (TextView) findViewById(R.id.header_device_name);
-        headerDeviceName.setText(
-                getString(R.string.list_device_name, BuildInfoUtils.getDevice()));
-
-        final TextView headerBuildDate = (TextView) findViewById(R.id.header_build_date);
-        headerBuildDate.setText(StringGenerator.getDateLocalizedUTC(this,
-                DateFormat.LONG, BuildInfoUtils.getBuildDateTimestamp()));
-
-        // Switch between header title and appbar title minimizing overlaps
-        final CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        final AppBarLayout appBar = (AppBarLayout) findViewById(R.id.app_bar);
-        appBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            boolean mIsShown = false;
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                int scrollRange = appBarLayout.getTotalScrollRange();
-                if (!mIsShown && scrollRange + verticalOffset < 10) {
-                    collapsingToolbar.setTitle(getString(R.string.display_name));
-                    mIsShown = true;
-                } else if (mIsShown && scrollRange + verticalOffset > 100) {
-                    collapsingToolbar.setTitle(null);
-                    mIsShown = false;
-                }
-            }
-        });
-
-        if (!Utils.hasTouchscreen(this)) {
-            // This can't be collapsed without a touchscreen
-            appBar.setExpanded(false);
-        }
-
-        mRefreshAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f);
-        mRefreshAnimation.setInterpolator(new LinearInterpolator());
-        mRefreshAnimation.setDuration(1000);
+    public void btnrefresh(View v){
+        downloadUpdatesList(true);
     }
 
     @Override
@@ -193,32 +141,6 @@ public class UpdatesActivity extends UpdatesListActivity {
         super.onStop();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_toolbar, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_refresh: {
-                downloadUpdatesList(true);
-                return true;
-            }
-            case R.id.menu_preferences: {
-                showPreferencesDialog();
-                return true;
-            }
-            case R.id.menu_show_changelog: {
-                Intent openUrl = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(Utils.getChangelogURL(this)));
-                startActivity(openUrl);
-                return true;
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -269,10 +191,10 @@ public class UpdatesActivity extends UpdatesListActivity {
         final List<UpdateInfo> sortedUpdates = controller.getUpdates();
         if (sortedUpdates.isEmpty()) {
             findViewById(R.id.no_new_updates_view).setVisibility(View.VISIBLE);
-            findViewById(R.id.recycler_view).setVisibility(View.GONE);
+            findViewById(R.id.parentupdates).setVisibility(View.GONE);
         } else {
             findViewById(R.id.no_new_updates_view).setVisibility(View.GONE);
-            findViewById(R.id.recycler_view).setVisibility(View.VISIBLE);
+            findViewById(R.id.parentupdates).setVisibility(View.VISIBLE);
             sortedUpdates.sort((u1, u2) -> Long.compare(u2.getTimestamp(), u1.getTimestamp()));
             for (UpdateInfo update : sortedUpdates) {
                 updateIds.add(update.getDownloadId());
@@ -302,7 +224,6 @@ public class UpdatesActivity extends UpdatesListActivity {
             final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             final long millis = System.currentTimeMillis();
             preferences.edit().putLong(Constants.PREF_LAST_UPDATE_CHECK, millis).apply();
-            updateLastCheckedString();
             if (json.exists() && Utils.isUpdateCheckEnabled(this) &&
                     Utils.checkForNewUpdates(json, jsonNew)) {
                 UpdatesCheckReceiver.updateRepeatingUpdatesCheck(this);
@@ -330,7 +251,7 @@ public class UpdatesActivity extends UpdatesListActivity {
                     if (!cancelled) {
                         showSnackbar(R.string.snack_updates_check_failed, Snackbar.LENGTH_LONG);
                     }
-                    refreshAnimationStop();
+
                 });
             }
 
@@ -344,7 +265,7 @@ public class UpdatesActivity extends UpdatesListActivity {
                 runOnUiThread(() -> {
                     Log.d(TAG, "List downloaded");
                     processNewJson(jsonFile, jsonFileTmp, manualRefresh);
-                    refreshAnimationStop();
+
                 });
             }
         };
@@ -362,19 +283,7 @@ public class UpdatesActivity extends UpdatesListActivity {
             return;
         }
 
-        refreshAnimationStart();
         downloadClient.start();
-    }
-
-    private void updateLastCheckedString() {
-        final SharedPreferences preferences =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        long lastCheck = preferences.getLong(Constants.PREF_LAST_UPDATE_CHECK, -1) / 1000;
-        final String lastCheckString = getString(R.string.header_last_updates_check,
-                StringGenerator.getDateLocalized(this, DateFormat.LONG, lastCheck),
-                StringGenerator.getTimeLocalized(this, lastCheck));
-        final TextView headerLastCheck = (TextView) findViewById(R.id.header_last_check);
-        headerLastCheck.setText(lastCheckString);
     }
 
     private void handleDownloadStatusChange(String downloadId) {
@@ -394,25 +303,7 @@ public class UpdatesActivity extends UpdatesListActivity {
 
     @Override
     public void showSnackbar(int stringId, int duration) {
-        Snackbar.make(findViewById(R.id.main_container), stringId, duration).show();
-    }
-
-    private void refreshAnimationStart() {
-        if (mRefreshIconView == null) {
-            mRefreshIconView = findViewById(R.id.menu_refresh);
-        }
-        if (mRefreshIconView != null) {
-            mRefreshAnimation.setRepeatCount(Animation.INFINITE);
-            mRefreshIconView.startAnimation(mRefreshAnimation);
-            mRefreshIconView.setEnabled(false);
-        }
-    }
-
-    private void refreshAnimationStop() {
-        if (mRefreshIconView != null) {
-            mRefreshAnimation.setRepeatCount(0);
-            mRefreshIconView.setEnabled(true);
-        }
+        Snackbar.make(findViewById(R.id.parentcontainer), stringId, duration).show();
     }
 
     private void showPreferencesDialog() {
