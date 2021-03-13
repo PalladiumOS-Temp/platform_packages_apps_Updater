@@ -149,8 +149,7 @@ public class Utils {
     public static String getServerURL(Context context) {
         String device = SystemProperties.get(Constants.PROP_NEXT_DEVICE,
                 SystemProperties.get(Constants.PROP_DEVICE));
-        String type = BuildInfoUtils.getBuildType().toLowerCase(Locale.ROOT);
-
+        String type = SystemProperties.get("ro.palladium.build.variant");
         String serverUrl = SystemProperties.get(Constants.PROP_UPDATER_URI);
         String overrideUrl = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(Constants.PREF_UPDATER_OVERRIDE_URI, "");
